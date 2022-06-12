@@ -20,7 +20,7 @@ public class BankAccount extends BaseEntity {
 
     @Id
     private String id;
-    private String accountHolder;
+    private String customerId;
     private Date createdDate;
     private AccountType accountType;
     private double balance;
