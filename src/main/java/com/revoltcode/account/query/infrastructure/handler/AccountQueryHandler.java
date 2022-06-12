@@ -1,9 +1,11 @@
-package com.revoltcode.account.query.api.queries;
+package com.revoltcode.account.query.infrastructure.handler;
 
-import com.revoltcode.account.query.api.dto.EqualityType;
-import com.revoltcode.account.query.api.domain.AccountRepository;
-import com.revoltcode.account.query.api.domain.BankAccount;
-import com.revoltcode.cqrs.core.domain.BaseEntity;
+import com.revoltcode.account.query.domain.model.BankAccount;
+import com.revoltcode.account.query.domain.repository.AccountRepository;
+import com.revoltcode.account.query.query.FindAccountByCustomerIdQuery;
+import com.revoltcode.account.query.query.FindAccountByIdQuery;
+import com.revoltcode.account.query.query.FindAllAccountQuery;
+import com.revoltcode.cqrs.core.domain.model.BaseEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,19 +38,11 @@ public class AccountQueryHandler implements QueryHandler{
     }
 
     @Override
-    public List<BaseEntity> handle(FindAccountByHolderQuery query) {
-        var bankAccount = accountRepository.findByAccountHolder(query.getAccountHolder());
+    public List<BaseEntity> handle(FindAccountByCustomerIdQuery query) {
+        var bankAccount = accountRepository.findByCustomerId(query.getAccountHolder());
         if(bankAccount.isEmpty()) return null;
         List<BaseEntity> bankAccountList = new ArrayList<>();
         bankAccountList.add(bankAccount.get());
-        return bankAccountList;
-    }
-
-    @Override
-    public List<BaseEntity> handle(FindAccountsWithBalanceQuery query) {
-        List<BaseEntity> bankAccountList = query.getEqualityType().equals(EqualityType.GREATER_THAN)?
-                accountRepository.findByBalanceGreaterThan(query.getBalance()) :
-                accountRepository.findByBalanceLessThan(query.getBalance());
         return bankAccountList;
     }
 }
