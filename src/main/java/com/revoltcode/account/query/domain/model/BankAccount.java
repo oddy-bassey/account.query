@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -21,7 +21,7 @@ public class BankAccount extends BaseEntity {
     @Id
     private String id;
     private String customerId;
-    private Date createdDate;
+    private LocalDateTime createdDate;
     private AccountType accountType;
     private double balance;
 }
