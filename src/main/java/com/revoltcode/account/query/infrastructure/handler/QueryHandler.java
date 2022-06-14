@@ -9,4 +9,5 @@ public interface QueryHandler {
     List<BaseEntity> handle(FindAllAccountQuery query);
     List<BaseEntity> handle(FindAccountByIdQuery query);
     List<BaseEntity> handle(FindAccountByCustomerIdQuery query);
+    List<BaseEntity> handle(FindAccountByCustomerIdAndAccountTypeQuery query);
 }

@@ -1,5 +1,6 @@
 package com.revoltcode.account.query.controller;
 
+import com.revoltcode.account.common.dto.AccountType;
 import com.revoltcode.account.query.domain.model.BankAccount;
 import com.revoltcode.account.query.dto.AccountLookupResponse;
 import com.revoltcode.account.query.query.*;
@@ -64,10 +65,30 @@ public class AccountLookupController {
         }
     }
 
-    @GetMapping("/byHolder/{accountHolder}")
-    public ResponseEntity<AccountLookupResponse> getAccountByHolder(@PathVariable("accountHolder") String accountHolder){
+    @GetMapping("/byCustomer/{customerId}")
+    public ResponseEntity<AccountLookupResponse> getAccountByCustomerId(@PathVariable("customerId") String customerId){
         try{
-            List<BankAccount> accounts = queryDispatcher.send(new FindAccountByCustomerIdQuery(accountHolder));
+            List<BankAccount> accounts = queryDispatcher.send(new FindAccountByCustomerIdQuery(customerId));
+            if(accounts == null || accounts.size() <= 0) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
+            var response = AccountLookupResponse.builder()
+                    .accounts(accounts)
+                    .message("Successfully returned bank account!")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (Exception e){
+            var safeErrorMessage = "Failed to complete get account by holder request!";
+            logger.log(Level.SEVERE, safeErrorMessage, e);
+            return new ResponseEntity<>(new AccountLookupResponse(safeErrorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/byCustomerAndAccountType/{customerId}/{accountType}")
+    public ResponseEntity<AccountLookupResponse> getAccountByCustomerAndAccountType(@PathVariable("customerId") String customerId,
+                @PathVariable("accountType") AccountType accountType){
+        try{
+            List<BankAccount> accounts = queryDispatcher.send(new FindAccountByCustomerIdAndAccountTypeQuery(customerId, accountType));
             if(accounts == null || accounts.size() <= 0) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
             var response = AccountLookupResponse.builder()

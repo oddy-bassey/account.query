@@ -2,6 +2,7 @@ package com.revoltcode.account.query.infrastructure.handler;
 
 import com.revoltcode.account.query.domain.model.BankAccount;
 import com.revoltcode.account.query.domain.repository.AccountRepository;
+import com.revoltcode.account.query.query.FindAccountByCustomerIdAndAccountTypeQuery;
 import com.revoltcode.account.query.query.FindAccountByCustomerIdQuery;
 import com.revoltcode.account.query.query.FindAccountByIdQuery;
 import com.revoltcode.account.query.query.FindAllAccountQuery;
@@ -39,7 +40,16 @@ public class AccountQueryHandler implements QueryHandler{
 
     @Override
     public List<BaseEntity> handle(FindAccountByCustomerIdQuery query) {
-        var bankAccount = accountRepository.findByCustomerId(query.getAccountHolder());
+        var bankAccount = accountRepository.findByCustomerId(query.getCustomerId());
+        if(bankAccount.isEmpty()) return null;
+        List<BaseEntity> bankAccountList = new ArrayList<>();
+        bankAccountList.add(bankAccount.get());
+        return bankAccountList;
+    }
+
+    @Override
+    public List<BaseEntity> handle(FindAccountByCustomerIdAndAccountTypeQuery query) {
+        var bankAccount = accountRepository.findByCustomerIdAndAccountType(query.getCustomerId(), query.getAccountType());
         if(bankAccount.isEmpty()) return null;
         List<BaseEntity> bankAccountList = new ArrayList<>();
         bankAccountList.add(bankAccount.get());
