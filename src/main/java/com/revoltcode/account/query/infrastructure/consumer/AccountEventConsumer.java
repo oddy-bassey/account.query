@@ -1,6 +1,6 @@
 package com.revoltcode.account.query.infrastructure.consumer;
 
-import com.revoltcode.account.common.event.*;
+import com.revoltcode.account.common.event.account.*;
 import com.revoltcode.account.query.infrastructure.handler.EventHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,9 @@
 package com.revoltcode.account.query.infrastructure.consumer;
 
-import com.revoltcode.account.common.event.*;
+import com.revoltcode.account.common.event.account.AccountClosedEvent;
+import com.revoltcode.account.common.event.account.AccountOpenedEvent;
+import com.revoltcode.account.common.event.account.FundsDepositedEvent;
+import com.revoltcode.account.common.event.account.FundsWithdrawnEvent;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 

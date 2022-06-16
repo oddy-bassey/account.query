@@ -1,4 +1,4 @@
-package com.revoltcode.account.query.domain.repository;
+package com.revoltcode.account.query.repository;
 
 import com.revoltcode.account.common.dto.AccountType;
 import com.revoltcode.account.query.domain.model.BankAccount;

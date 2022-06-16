@@ -1,7 +1,7 @@
 package com.revoltcode.account.query.infrastructure.handler;
 
 import com.revoltcode.account.query.domain.model.BankAccount;
-import com.revoltcode.account.query.domain.repository.AccountRepository;
+import com.revoltcode.account.query.repository.AccountRepository;
 import com.revoltcode.account.query.query.FindAccountByCustomerIdAndAccountTypeQuery;
 import com.revoltcode.account.query.query.FindAccountByCustomerIdQuery;
 import com.revoltcode.account.query.query.FindAccountByIdQuery;
