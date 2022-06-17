@@ -47,7 +47,6 @@ public class AccountEventHandler implements EventHandler {
         var transactionTime = LocalDateTime.now();
         bankAccount.setBalance(bankAccount.getBalance() + event.getAmount());
         bankAccount.setLastUpdatedDate(transactionTime);
-        log.info("Time of transaction", transactionTime.toString());
 
         accountRepository.save(bankAccount);
 
@@ -59,7 +58,8 @@ public class AccountEventHandler implements EventHandler {
                         event.getAmount(), "", bankAccount.getId()))
                 .transactionTime(transactionTime)
                 .build();
-        transactionEventProducer.produce(transactionEvent.getClass().getSimpleName(), transactionEvent);
+
+        transactionEventProducer.produce("DepositedTransactionEvent", transactionEvent);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class AccountEventHandler implements EventHandler {
                         event.getAmount(), "", bankAccount.getId()))
                 .transactionTime(transactionTime)
                 .build();
-        transactionEventProducer.produce(transactionEvent.getClass().getSimpleName(), transactionEvent);
+        transactionEventProducer.produce("WithdrawnTransactionEvent", transactionEvent);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class AccountEventHandler implements EventHandler {
                         event.getAmount(), debitAccount.getName(), debitAccount.getId(), creditAccount.getName(), creditAccount.getId()))
                 .transactionTime(transactionTime)
                 .build();
-        transactionEventProducer.produce(transactionEvent.getClass().getSimpleName(), transactionEvent);
+        transactionEventProducer.produce("TransferTransactionEvent", transactionEvent);
     }
 
 

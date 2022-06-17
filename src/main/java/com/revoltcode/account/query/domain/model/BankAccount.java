@@ -8,9 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -31,6 +29,7 @@ public class BankAccount extends BaseEntity {
     private String customerId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column
     private AccountType accountType;
 

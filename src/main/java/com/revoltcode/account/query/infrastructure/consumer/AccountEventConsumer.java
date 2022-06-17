@@ -3,7 +3,6 @@ package com.revoltcode.account.query.infrastructure.consumer;
 import com.revoltcode.account.common.event.account.*;
 import com.revoltcode.account.query.infrastructure.handler.EventHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountEventConsumer implements EventConsumer{
 
-    @Autowired
     private final EventHandler eventHandler;
 
     @KafkaListener(topics = "AccountOpenedEvent", groupId = "${spring.kafka.consumer.group-id}")
