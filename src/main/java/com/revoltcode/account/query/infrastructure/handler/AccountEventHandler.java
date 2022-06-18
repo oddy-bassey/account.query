@@ -1,10 +1,10 @@
 package com.revoltcode.account.query.infrastructure.handler;
 
+import com.revoltcode.account.common.dto.TransactionType;
 import com.revoltcode.account.common.event.account.*;
-import com.revoltcode.account.common.event.transaction.DepositedTransactionEvent;
-import com.revoltcode.account.common.event.transaction.TransferTransactionEvent;
-import com.revoltcode.account.common.event.transaction.WithdrawnTransactionEvent;
+import com.revoltcode.account.common.event.transaction.TransactionEvent;
 import com.revoltcode.account.common.exception.AccountNotFoundException;
+import com.revoltcode.account.query.infrastructure.service.TransactionService;
 import com.revoltcode.account.query.repository.AccountRepository;
 import com.revoltcode.account.query.domain.model.BankAccount;
 import com.revoltcode.account.query.infrastructure.producer.TransactionEventProducer;
@@ -22,6 +22,7 @@ public class AccountEventHandler implements EventHandler {
 
     private final AccountRepository accountRepository;
     private final TransactionEventProducer transactionEventProducer;
+    private final TransactionService transactionFeignService;
 
     @Override
     public void on(AccountOpenedEvent event) {
@@ -50,16 +51,15 @@ public class AccountEventHandler implements EventHandler {
 
         accountRepository.save(bankAccount);
 
-        var transactionEvent = DepositedTransactionEvent.builder()
-                .id(bankAccount.getId())
-                .accountName(bankAccount.getName())
-                .amount(event.getAmount())
-                .description(MessageFormat.format("An amount of {0} was deposited into ({1}) account with id: {2}",
-                        event.getAmount(), "", bankAccount.getId()))
-                .transactionTime(transactionTime)
-                .build();
+        var transaction = createTransactionEvent(
+                bankAccount.getId(), bankAccount.getName(),
+                event.getAmount(), TransactionType.DEPOSIT,
+                MessageFormat.format("An amount of {0} was deposited into ({1}) account with id: {2}",
+                        event.getAmount(), "", bankAccount.getId()),
+                transactionTime);
 
-        transactionEventProducer.produce("DepositedTransactionEvent", transactionEvent);
+        //ToDO: create a deposit event and make POST request to transactions
+        transactionFeignService.postTransaction(transaction);
     }
 
     @Override
@@ -74,15 +74,15 @@ public class AccountEventHandler implements EventHandler {
 
         accountRepository.save(bankAccount);
 
-        var transactionEvent = WithdrawnTransactionEvent.builder()
-                .id(bankAccount.getId())
-                .accountName(bankAccount.getName())
-                .amount(event.getAmount())
-                .description(MessageFormat.format("An amount of {0} was withdrawn from ({1}) account with id: {2}",
-                        event.getAmount(), "", bankAccount.getId()))
-                .transactionTime(transactionTime)
-                .build();
-        transactionEventProducer.produce("WithdrawnTransactionEvent", transactionEvent);
+        var transaction = createTransactionEvent(
+                bankAccount.getId(), bankAccount.getName(),
+                event.getAmount(), TransactionType.WITHDRAWAL,
+                MessageFormat.format("An amount of {0} was withdrawn from ({1}) account with id: {2}",
+                        event.getAmount(), "", bankAccount.getId()),
+                transactionTime);
+
+        //ToDO: create a withdraw event and make POST request to transactions
+        transactionFeignService.postTransaction(transaction);
     }
 
     @Override
@@ -104,22 +104,24 @@ public class AccountEventHandler implements EventHandler {
         creditAccount.setLastUpdatedDate(transactionTime);
         accountRepository.save(creditAccount);
 
-        var transactionEvent = TransferTransactionEvent.builder()
-                .id(debitAccount.getId())
-                .debitAccountName(debitAccount.getName())
-                .creditAccountId(creditAccount.getId())
-                .creditAccountName(creditAccount.getName())
-                .amount(event.getAmount())
-                .description(MessageFormat.format("An amount of {0} was transferred from ({1}) account with id: {2} into ({3}) account with id: {4}",
-                        event.getAmount(), debitAccount.getName(), debitAccount.getId(), creditAccount.getName(), creditAccount.getId()))
-                .transactionTime(transactionTime)
-                .build();
-        transactionEventProducer.produce("TransferTransactionEvent", transactionEvent);
+        //ToDO: create a transfer event and make POST request to transactions
     }
-
 
     @Override
     public void on(AccountClosedEvent event) {
         accountRepository.deleteById(event.getId());
+    }
+
+    public TransactionEvent createTransactionEvent(String id, String accountName, double amount,
+                 TransactionType transactionType, String description, LocalDateTime transactionTIme){
+
+        return TransactionEvent.builder()
+                .id(id)
+                .accountName(accountName)
+                .amount(amount)
+                .transactionType(transactionType)
+                .description(description)
+                .transactionTime(transactionTIme)
+                .build();
     }
 }
