@@ -1,12 +1,16 @@
 package com.revoltcode.account.query.controller;
 
 import com.revoltcode.account.common.dto.AccountType;
+import com.revoltcode.account.common.dto.rest.Customer;
+import com.revoltcode.account.common.dto.rest.Transaction;
+import com.revoltcode.account.query.domain.dto.AccountDetailsResponse;
 import com.revoltcode.account.query.domain.model.BankAccount;
 import com.revoltcode.account.query.domain.dto.AccountLookupResponse;
+import com.revoltcode.account.query.infrastructure.service.CustomerService;
+import com.revoltcode.account.query.infrastructure.service.TransactionService;
 import com.revoltcode.account.query.query.*;
 import com.revoltcode.cqrs.core.infrastructure.dispatcher.QueryDispatcher;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +26,9 @@ import java.util.List;
 @RequestMapping("/api/v1/accountLookup")
 public class AccountLookupController {
 
-    @Autowired
     private final QueryDispatcher queryDispatcher;
+    private final CustomerService customerService;
+    private final TransactionService transactionService;
 
     @GetMapping("/")
     public ResponseEntity<AccountLookupResponse> getAllAccounts(){
@@ -77,5 +82,20 @@ public class AccountLookupController {
                 .message("Successfully returned bank account!")
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/details/{accountId}")
+    public ResponseEntity<?> getAccountDetails(@PathVariable("accountId") String accountId){
+        BankAccount account = (BankAccount) queryDispatcher.send(new FindAccountByIdQuery(accountId)).get(0);
+        Customer customer = customerService.getCustomer(account.getCustomerId()).getBody();
+        List<Transaction> transactions = transactionService.getTransactionsByAccountId(account.getId()).getBody();
+
+        AccountDetailsResponse details = AccountDetailsResponse.builder()
+                .accountInfo(account)
+                .customerInfo(customer)
+                .accountTransactions(transactions)
+                .build();
+
+        return new ResponseEntity<>(details, HttpStatus.OK);
     }
 }
