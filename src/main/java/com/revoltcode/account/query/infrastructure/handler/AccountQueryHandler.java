@@ -1,17 +1,16 @@
 package com.revoltcode.account.query.infrastructure.handler;
 
+import com.revoltcode.account.query.domain.dto.AccountCount;
 import com.revoltcode.account.query.domain.model.BankAccount;
+import com.revoltcode.account.query.query.*;
 import com.revoltcode.account.query.repository.AccountRepository;
-import com.revoltcode.account.query.query.FindAccountByCustomerIdAndAccountTypeQuery;
-import com.revoltcode.account.query.query.FindAccountByCustomerIdQuery;
-import com.revoltcode.account.query.query.FindAccountByIdQuery;
-import com.revoltcode.account.query.query.FindAllAccountQuery;
 import com.revoltcode.cqrs.core.domain.model.BaseEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -54,5 +53,11 @@ public class AccountQueryHandler implements QueryHandler{
         List<BaseEntity> bankAccountList = new ArrayList<>();
         bankAccountList.add(bankAccount.get());
         return bankAccountList;
+    }
+
+    @Override
+    public List<BaseEntity> handle(GetAccountCountQuery query) {
+        long numberOfAccounts = accountRepository.count();
+        return Collections.singletonList(new AccountCount(numberOfAccounts));
     }
 }

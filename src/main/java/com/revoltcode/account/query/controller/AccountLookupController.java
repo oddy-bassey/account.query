@@ -1,8 +1,10 @@
 package com.revoltcode.account.query.controller;
 
 import com.revoltcode.account.common.dto.AccountType;
+import com.revoltcode.account.common.dto.BaseResponse;
 import com.revoltcode.account.common.dto.rest.Customer;
 import com.revoltcode.account.common.dto.rest.Transaction;
+import com.revoltcode.account.query.domain.dto.AccountCount;
 import com.revoltcode.account.query.domain.dto.AccountDetailsResponse;
 import com.revoltcode.account.query.domain.model.BankAccount;
 import com.revoltcode.account.query.domain.dto.AccountLookupResponse;
@@ -85,7 +87,7 @@ public class AccountLookupController {
     }
 
     @GetMapping("/details/{accountId}")
-    public ResponseEntity<?> getAccountDetails(@PathVariable("accountId") String accountId){
+    public ResponseEntity<AccountDetailsResponse> getAccountDetails(@PathVariable("accountId") String accountId){
         BankAccount account = (BankAccount) queryDispatcher.send(new FindAccountByIdQuery(accountId)).get(0);
         Customer customer = customerService.getCustomer(account.getCustomerId()).getBody();
         List<Transaction> transactions = transactionService.getTransactionsByAccountId(account.getId()).getBody();
@@ -97,5 +99,12 @@ public class AccountLookupController {
                 .build();
 
         return new ResponseEntity<>(details, HttpStatus.OK);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getCountOfAccounts(){
+        AccountCount count = (AccountCount) queryDispatcher.send(new GetAccountCountQuery()).get(0);
+        long numberOfAccounts = count.getNumberOfAccounts();
+        return new ResponseEntity<>(numberOfAccounts, HttpStatus.OK);
     }
 }
