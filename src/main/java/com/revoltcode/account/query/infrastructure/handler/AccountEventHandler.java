@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 
@@ -46,7 +47,7 @@ public class AccountEventHandler implements EventHandler {
                         MessageFormat.format("Account with id: {0} does not exist!", event.getId())));
 
         var transactionTime = LocalDateTime.now();
-        bankAccount.setBalance(bankAccount.getBalance() + event.getAmount());
+        bankAccount.setBalance(bankAccount.getBalance().add(event.getAmount()));
         bankAccount.setLastUpdatedDate(transactionTime);
 
         accountRepository.save(bankAccount);
@@ -69,7 +70,7 @@ public class AccountEventHandler implements EventHandler {
                         MessageFormat.format("Account with id: {0} does not exist!", event.getId())));
 
         var transactionTime = LocalDateTime.now();
-        bankAccount.setBalance(bankAccount.getBalance() - event.getAmount());
+        bankAccount.setBalance(bankAccount.getBalance().subtract(event.getAmount()));
         bankAccount.setLastUpdatedDate(transactionTime);
 
         accountRepository.save(bankAccount);
@@ -87,6 +88,7 @@ public class AccountEventHandler implements EventHandler {
 
     @Override
     public void on(FundsTransferedEvent event) {
+        //ToDO: rewrite funds transfer
         var debitAccount = accountRepository.findById(event.getId())
                 .orElseThrow(() -> new AccountNotFoundException(
                         MessageFormat.format("The debit account with id: {0} does not exist!", event.getId())));
@@ -96,11 +98,11 @@ public class AccountEventHandler implements EventHandler {
                         MessageFormat.format("The credit account with id: {0} does not exist!", event.getId())));
 
         var transactionTime = LocalDateTime.now();
-        debitAccount.setBalance(debitAccount.getBalance() - event.getAmount());
+        debitAccount.setBalance(debitAccount.getBalance().subtract(event.getAmount()));
         debitAccount.setLastUpdatedDate(transactionTime);
         accountRepository.save(debitAccount);
 
-        creditAccount.setBalance(creditAccount.getBalance()+ event.getAmount());
+        creditAccount.setBalance(creditAccount.getBalance().add(event.getAmount()));
         creditAccount.setLastUpdatedDate(transactionTime);
         accountRepository.save(creditAccount);
 
@@ -112,7 +114,7 @@ public class AccountEventHandler implements EventHandler {
         accountRepository.deleteById(event.getId());
     }
 
-    public TransactionEvent createTransactionEvent(String id, String accountName, double amount,
+    public TransactionEvent createTransactionEvent(String id, String accountName, BigDecimal amount,
                  TransactionType transactionType, String description, LocalDateTime transactionTIme){
 
         return TransactionEvent.builder()
