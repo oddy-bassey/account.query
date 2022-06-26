@@ -32,3 +32,9 @@ spring:
 eureka:
   instance:
     instance-id: ${spring.application.name}:${random.uuid}
+
+feign:
+  customer:
+    hostname: localhost
+  transaction:
+    hostname: localhost
